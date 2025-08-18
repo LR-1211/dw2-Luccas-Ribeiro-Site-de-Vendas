@@ -1,0 +1,86 @@
+GET http://localhost:8000/health HTTP/1.1
+Accept: application/json
+
+###
+
+GET http://localhost:8000/produtos?search=&categoria=&sort= HTTP/1.1
+Accept: application/json
+
+###
+
+POST http://localhost:8000/produtos HTTP/1.1
+Content-Type: application/json
+
+{
+  "nome": "Caneta Azul",
+  "descricao": "Caneta esferográfica azul",
+  "preco": 2.50,
+  "estoque": 10,
+  "categoria": "Canetas",
+  "sku": "CAN-001"
+}
+
+###
+
+POST http://localhost:8000/produtos HTTP/1.1
+Content-Type: application/json
+
+{
+  "nome": "Caderno Universitário",
+  "descricao": "Caderno com 200 folhas",
+  "preco": 25.00,
+  "estoque": 0,
+  "categoria": "Cadernos"
+}
+
+###
+
+POST http://localhost:8000/cupom/validar HTTP/1.1
+Content-Type: application/json
+
+{
+  "cupom": "ALUNO10",
+  "subtotal": 60.00
+}
+
+###
+
+POST http://localhost:8000/cupom/validar HTTP/1.1
+Content-Type: application/json
+
+{
+  "cupom": "ALUNO10",
+  "subtotal": 40.00
+}
+
+###
+
+POST http://localhost:8000/carrinho/confirmar HTTP/1.1
+Content-Type: application/json
+
+{
+  "itens": [
+    {
+      "produto_id": 1,
+      "quantidade": 2
+    },
+    {
+      "produto_id": 2,
+      "quantidade": 1
+    }
+  ]
+}
+
+###
+
+POST http://localhost:8000/carrinho/confirmar HTTP/1.1
+Content-Type: application/json
+
+{
+  "itens": [
+    {
+      "produto_id": 3,
+      "quantidade": 5
+    }
+  ]
+}
