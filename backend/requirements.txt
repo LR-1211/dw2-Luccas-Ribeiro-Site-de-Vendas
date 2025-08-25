@@ -1,7 +1,0 @@
-FastAPI
-Flask
-SQLAlchemy
-sqlite3
-pydantic
-uvicorn
-requests
