@@ -1,5 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pathlib import Path
 from database import SessionLocal, engine
 from models import Base, Product, Order, OrderItem
 from sqlalchemy.orm import Session
@@ -7,6 +10,13 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 app = FastAPI()
+
+# Serve frontend static files (assumes frontend/ is a sibling of backend/)
+ROOT_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = ROOT_DIR / "frontend"
+if FRONTEND_DIR.exists():
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
+
 
 # CORS middleware
 app.add_middleware(
