@@ -16,8 +16,8 @@
 
   <!-- Top tabs -->
   <nav class="top-nav">
-    <button id="tab-products" class="tab active">Produtos</button>
-    <button id="tab-admin" class="tab">Admin</button>
+  <button id="tab-products" class="tab active">Produtos</button>
+  <button id="tab-admin" class="tab">Login</button>
   </nav>
 
   <main>
@@ -49,9 +49,24 @@
       </div>
     </section>
 
-  <!-- Admin (hidden by default, accessible via top tab) -->
+  <!-- Admin / Login (hidden by default, accessible via top tab) -->
   <section id="admin" class="hidden">
-      <h2>Adicionar Produto</h2>
+    <div id="login-area">
+      <h2>Área de Login</h2>
+      <div class="login-form">
+        <input type="text" id="login-username" placeholder="Usuário">
+        <input type="password" id="login-password" placeholder="Senha">
+        <div class="login-actions">
+          <button id="login-btn" class="btn-primary">Entrar</button>
+          <button id="create-user-btn" class="btn">Criar conta</button>
+          <button id="logout-btn" class="btn" style="display:none;">Sair</button>
+        </div>
+        <p id="login-message" class="login-message"></p>
+      </div>
+    </div>
+
+    <div id="admin-panel" class="hidden">
+      <h2>Adicionar Produto (Admin)</h2>
       <form id="product-form" class="admin-form">
         <input type="text" id="nome" placeholder="Nome" required minlength="3" maxlength="60">
         <textarea id="descricao" placeholder="Descrição"></textarea>
@@ -67,7 +82,8 @@
         <input type="text" id="sku" placeholder="SKU (opcional)">
         <button type="submit" class="btn-primary">Adicionar Produto</button>
       </form>
-    </section>
+    </div>
+  </section>
   </main>
 
   <!-- Toast notification -->

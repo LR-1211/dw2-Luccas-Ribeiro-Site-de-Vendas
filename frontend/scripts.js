@@ -27,10 +27,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Toast utility
   const toast = document.getElementById('toast');
-  function showToast(message, ms = 2000) {
+  function showToast(message, ms = 2000, type = 'info') {
     if (!toast) return;
     toast.textContent = message;
-    toast.classList.add('show');
+    toast.className = 'toast show ' + (type ? 'toast-' + type : '');
     setTimeout(() => toast.classList.remove('show'), ms);
   }
 
@@ -186,6 +186,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Admin form
   productForm.addEventListener("submit", e => {
     e.preventDefault();
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser')) || null;
+    if (!currentUser || !currentUser.loggedIn || currentUser.username !== 'admin') {
+      showToast('Acesso negado. Faça login como admin para adicionar produtos.');
+      return;
+    }
     const newProduct = {
       id: products.length + 1,
       name: document.getElementById("nome").value,
@@ -199,7 +204,99 @@ document.addEventListener("DOMContentLoaded", () => {
     products.push(newProduct);
     renderProducts(products);
     productForm.reset();
+    showToast('Produto adicionado com sucesso');
   });
+
+  // --- Simple user system (localStorage) ---
+  const loginBtn = document.getElementById('login-btn');
+  const createUserBtn = document.getElementById('create-user-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  const loginMessage = document.getElementById('login-message');
+  const adminPanel = document.getElementById('admin-panel');
+
+  function getUsers() {
+    return JSON.parse(localStorage.getItem('users')) || [];
+  }
+  function saveUsers(u) {
+    localStorage.setItem('users', JSON.stringify(u));
+  }
+
+  function showAdminIfAuthorized() {
+    const cur = JSON.parse(sessionStorage.getItem('currentUser')) || null;
+    if (cur && cur.loggedIn && cur.username === 'admin') {
+      adminPanel.classList.remove('hidden');
+      document.getElementById('login-area').classList.add('hidden');
+      logoutBtn.style.display = 'inline-block';
+    } else {
+      adminPanel.classList.add('hidden');
+      document.getElementById('login-area').classList.remove('hidden');
+      logoutBtn.style.display = 'none';
+    }
+    // update top tab label to show username if logged in
+    const tabAdminBtn = document.getElementById('tab-admin');
+    if (tabAdminBtn) {
+      if (cur && cur.loggedIn) {
+        tabAdminBtn.textContent = cur.username;
+        tabAdminBtn.classList.add('user-badge');
+      } else {
+        tabAdminBtn.textContent = 'Login';
+        tabAdminBtn.classList.remove('user-badge');
+      }
+    }
+  }
+
+  // Create a user (stores username + password plaintext in localStorage for demo only)
+  createUserBtn.addEventListener('click', () => {
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+    if (!username || !password) {
+      loginMessage.textContent = 'Informe usuário e senha para criar conta.';
+      return;
+    }
+    const users = getUsers();
+    if (users.find(u => u.username === username)) {
+      loginMessage.textContent = 'Usuário já existe.';
+      return;
+    }
+    users.push({ username, password });
+    saveUsers(users);
+    loginMessage.textContent = 'Conta criada. Você pode entrar agora.';
+  });
+
+  // Login
+  loginBtn.addEventListener('click', () => {
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+    const users = getUsers();
+    const match = users.find(u => u.username === username && u.password === password);
+    // allow the special built-in admin credentials
+    if (!match && !(username === 'admin' && password === '123')) {
+      loginMessage.textContent = 'Credenciais inválidas.';
+      return;
+    }
+    const cur = { username, loggedIn: true };
+    sessionStorage.setItem('currentUser', JSON.stringify(cur));
+    loginMessage.textContent = '';
+    showAdminIfAuthorized();
+    // nicer feedback
+    showToast(`Bem vindo, ${username}!`, 2500, 'success');
+    // small animation on top tab
+    const tabAdminBtn = document.getElementById('tab-admin');
+    if (tabAdminBtn) {
+      tabAdminBtn.classList.add('pulse');
+      setTimeout(() => tabAdminBtn.classList.remove('pulse'), 1200);
+    }
+  });
+
+  logoutBtn.addEventListener('click', () => {
+  sessionStorage.removeItem('currentUser');
+  loginMessage.textContent = 'Desconectado.';
+  showAdminIfAuthorized();
+  showToast('Sessão encerrada.', 1800, 'info');
+  });
+
+  // Initialize admin visibility
+  showAdminIfAuthorized();
 
   // Busca
   searchInput.addEventListener("input", () => {
